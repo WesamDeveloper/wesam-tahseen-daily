@@ -1,3 +1,4 @@
+import 'package:dene/screen/begin.dart';
 import 'package:dene/screen/home_page.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +28,7 @@ class _MyAppState extends State<MyApp> {
               color: Colors.black)
         )
       ),
-      home: HomePage(),
+      home: SplashScreen(),
     );
   }
 }

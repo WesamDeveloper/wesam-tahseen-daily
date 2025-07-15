@@ -1,16 +1,20 @@
+import 'package:dene/screen/azkaar/al_sabh.dart';
+import 'package:dene/screen/azkaar/al_masi.dart';
+import 'package:dene/screen/azkaar/sleep.dart';
+import 'package:dene/screen/azkaar/safer.dart';
+import 'package:dene/screen/azkaar/al_ham.dart';
 import 'package:dene/screen/tsbeh.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'al_masi.dart';
-import 'al_sabh.dart';
 
 class Prayers extends StatelessWidget {
   const Prayers({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAF5EF),
-      appBar: AppBar(title: Text("الاذكار"),centerTitle: true,),
+      appBar: AppBar(title: Text("الاذكار"), centerTitle: true),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -25,7 +29,7 @@ class Prayers extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    const SizedBox(height: 130),
+                    const SizedBox(height: 70),
                     const Text(
                       "﷽",
                       style: TextStyle(
@@ -50,6 +54,27 @@ class Prayers extends StatelessWidget {
                       icon: Icons.wb_sunny,
                       color: Colors.orange,
                       destination: const Sabh(),
+                    ),
+                    buildIslamicCard(
+                      context,
+                      title: "أذكار النوم",
+                      icon: Icons.bedtime,
+                      color: Colors.deepPurple,
+                      destination: const Sleep(),
+                    ),
+                    buildIslamicCard(
+                      context,
+                      title: "دعاء السفر",
+                      icon: Icons.airplanemode_active,
+                      color: Colors.blueGrey,
+                      destination: const Safer(),
+                    ),
+                    buildIslamicCard(
+                      context,
+                      title: "أذكار الهم والكرب",
+                      icon: Icons.sentiment_dissatisfied,
+                      color: Colors.redAccent,
+                      destination: const Alham(),
                     ),
                     buildIslamicCard(
                       context,

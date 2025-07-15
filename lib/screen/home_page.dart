@@ -1,3 +1,4 @@
+import 'package:dene/screen/about.dart';
 import 'package:dene/screen/prayers.dart';
 //import 'package:dene/screen/quranPage.dart';
 import 'package:dene/screen/quran_page.dart';
@@ -35,7 +36,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     //// use "MotionTabBarController" to replace with "TabController", if you need to programmatically change the tab
     _motionTabBarController = MotionTabBarController(
       initialIndex: 0,
-      length: 2,
+      length: 3,
       vsync: this,
     );
   }
@@ -53,11 +54,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       bottomNavigationBar: MotionTabBar(
         controller: _motionTabBarController, // ADD THIS if you need to change your tab programmatically
         initialSelectedTab: "Prayers",
-        labels: const ["Prayers", "Quran"],
+        labels: const ["Prayers", "Quran","About Me"],
         icons: const [
          // Icons.home,
           Icons.mosque, // Using a mosque icon for prayers
-          Icons.book, // Using a book icon for Quran
+          Icons.book,
+          Icons.person
+          // Using a book icon for Quran
          // Icons.settings
         ],
 
@@ -96,6 +99,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
           const Center(
             child: QuranPage(),
+          ),
+          const Center(
+            child: CoreTeam(),
           ),
           // const Center(
           //   child: Settings(),

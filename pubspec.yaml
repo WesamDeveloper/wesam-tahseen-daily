@@ -38,6 +38,7 @@ dependencies:
   shared_preferences: ^2.5.3
   iconsax: ^0.0.8
   flutter_launcher_icons: ^0.14.4
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4"
