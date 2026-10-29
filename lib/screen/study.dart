@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
+import '../features/study/views/study_view.dart';
 
-
-class Study extends StatefulWidget {
+class Study extends StatelessWidget {
   const Study({super.key});
 
   @override
-  State<Study> createState() => _StudyState();
-}
-
-class _StudyState extends State<Study> {
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-     appBar: AppBar(title: Text("الدروس"),centerTitle: true,),
-      body: Center(child: Text("Study here",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),),),
-    );
+    return const StudyView();
   }
 }

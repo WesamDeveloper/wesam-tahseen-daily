@@ -1,34 +1,34 @@
-import 'package:dene/screen/begin.dart';
-import 'package:dene/screen/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'core/bindings/initial_binding.dart';
+import 'core/constants/app_strings.dart';
+import 'core/routes/app_pages.dart';
+import 'core/services/storage_service.dart';
+import 'core/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Get.putAsync<StorageService>(
+    () async => await StorageService().init(),
+    permanent: true,
+  );
   runApp(const MyApp());
 }
 
-
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.orange[400],
-          centerTitle: true,
-          titleTextStyle: TextStyle(
-              fontFamily: "Rakkas",
-              fontSize: 28,
-              color: Colors.black)
-        )
-      ),
-      home: SplashScreen(),
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: AppStrings.appName,
+      theme: AppTheme.lightTheme,
+      initialRoute: AppPages.initial,
+      getPages: AppPages.routes,
+      initialBinding: InitialBinding(),
+      locale: const Locale('en'),
+      fallbackLocale: const Locale('en'),
     );
   }
 }

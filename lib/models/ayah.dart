@@ -6,10 +6,6 @@ class Ayah {
   Ayah({required this.surah, required this.ayah, required this.text});
 
   factory Ayah.fromJson(Map<String, dynamic> json) {
-    return Ayah(
-      surah: json['surah'],
-      ayah: json['ayah'],
-      text: json['text'],
-    );
+    return Ayah(surah: json['surah'], ayah: json['ayah'], text: json['text']);
   }
 }
