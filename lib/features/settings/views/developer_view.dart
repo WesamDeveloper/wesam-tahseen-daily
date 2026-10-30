@@ -158,6 +158,25 @@ class DeveloperInfoView extends StatelessWidget {
                         'البريد الإلكتروني',
                       ),
                     ),
+                    const Divider(
+                      height: 1,
+                      indent: 58,
+                      endIndent: 0,
+                      color: _dividerColor,
+                    ),
+                    // Telegram Tile
+                    _buildContactTile(
+                      icon: Icons.send_rounded,
+                      iconBg: const Color(0xFF229ED9),
+                      title: AppStrings.developerTelegramTitle,
+                      value: AppStrings.developerTelegramHandle,
+                      actionLabel: 'زيارة القناة',
+                      onTap: () => controller.launchTelegram(),
+                      onLongPress: () => controller.copyToClipboard(
+                        AppStrings.developerTelegramUrl,
+                        AppStrings.developerTelegramTitle,
+                      ),
+                    ),
                   ],
                 ),
               ),

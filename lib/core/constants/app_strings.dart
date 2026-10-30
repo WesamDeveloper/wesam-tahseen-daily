@@ -40,6 +40,29 @@ class AppStrings {
       'وسام الجنيد، مطور تطبيقات Flutter، مهتم بتطوير التطبيقات وتقديم تجارب رقمية بسيطة ومفيدة.';
   static const String developerPhone = '+967775904988';
   static const String developerEmail = 'wesam.developer@gmail.com';
+  static const String developerTelegramUrl = 'https://t.me/WesamTahseen';
+  static const String developerTelegramHandle = '@WesamTahseen';
+  static const String developerTelegramTitle = 'قناة التلجرام';
+  static const String developerTelegramSubtitle = 'تحميل أحدث نسخ التطبيق والتحديثات';
+
+  // App Sharing
+  static const String appShareMessage =
+      'تطبيق وسام للتحصين اليومي 🌿\n'
+      'تطبيق إسلامي شامل للأذكار، المصحف الشريف، والتلاوات الصوتية، مجاني وبدون إعلانات.\n\n'
+      'لتحميل أحدث نسخ التطبيق ومتابعة التحديثات عبر تيليجرام:\n'
+      'https://t.me/WesamTahseen\n\n'
+      'نسأل الله أن ينفع به الجميع ويجعله صدقة جارية 🌿';
+
+  // Quran Bookmark
+  static const String quranBookmarkTitle = 'فاصل القراءة';
+  static const String quranBookmarkSaved = 'تم حفظ الفاصل بنجاح 🔖';
+  static const String quranBookmarkRemoved = 'تمت إزالة الفاصل بنجاح';
+  static const String quranBookmarkGoTo = 'الانتقال إلى الفاصل';
+  static const String quranBookmarkSetHere = 'وضع فاصل القراءة هنا';
+  static const String quranBookmarkCurrent = 'فاصل القراءة الحالي';
+  static const String quranBookmarkContinue = 'متابعة القراءة من الفاصل';
+  static const String quranBookmarkEmpty =
+      'لم تقم بتحديد فاصل قراءة بعد. يمكنك الضغط على أيقونة الفاصل عند أي آية لتثبيته 🌿';
 
   // Settings & Notifications
   static const String quranReminderTitle = 'التذكير بالقرآن الكريم';

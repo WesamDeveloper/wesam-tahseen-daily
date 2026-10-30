@@ -15,4 +15,11 @@ class StorageKeys {
   static const String lastAppActiveTimestamp = 'last_app_active_timestamp';
   static const String lastNotificationMessageId = 'last_notification_message_id';
   static const String nextScheduledNotificationTimestamp = 'next_scheduled_notification_timestamp';
+
+  /// Quran Reading Bookmark keys
+  static const String quranBookmarkSurah = 'quran_bookmark_surah';
+  static const String quranBookmarkSurahName = 'quran_bookmark_surah_name';
+  static const String quranBookmarkAyah = 'quran_bookmark_ayah';
+  static const String quranBookmarkAyahText = 'quran_bookmark_ayah_text';
+  static const String quranBookmarkTimestamp = 'quran_bookmark_timestamp';
 }

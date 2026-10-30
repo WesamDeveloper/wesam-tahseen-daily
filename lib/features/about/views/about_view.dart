@@ -92,6 +92,15 @@ class AboutView extends GetView<AboutController> {
                           'https://github.com/WesamTechnology',
                         ),
                   ),
+                  const SizedBox(height: 8),
+                  ContactTile(
+                    icon: Icons.send_rounded,
+                    title: 'قناة التلجرام (t.me/WesamTahseen)',
+                    onTap:
+                        () => controller.launchWeb(
+                          'https://t.me/WesamTahseen',
+                        ),
+                  ),
                 ],
               ),
             ],

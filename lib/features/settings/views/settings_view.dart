@@ -73,9 +73,10 @@ class SettingsView extends StatelessWidget {
                     trailingWidget: Obx(() {
                       final enabled = notifCtrl.isNotificationsEnabled.value;
                       final interval = notifCtrl.selectedIntervalDays.value;
-                      final label = enabled
-                          ? 'مفعل (${notifCtrl.getIntervalLabel(interval)})'
-                          : 'متوقف';
+                      final label =
+                          enabled
+                              ? 'مفعل (${notifCtrl.getIntervalLabel(interval)})'
+                              : 'متوقف';
                       return Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -83,13 +84,13 @@ class SettingsView extends StatelessWidget {
                             label,
                             style: TextStyle(
                               fontSize: 13,
-                              color: enabled
-                                  ? const Color(0xFF34C759)
-                                  : _textSecondary,
+                              color:
+                                  enabled
+                                      ? const Color(0xFF34C759)
+                                      : _textSecondary,
                               fontFamily: AppStrings.fontCairo,
-                              fontWeight: enabled
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
+                              fontWeight:
+                                  enabled ? FontWeight.w600 : FontWeight.normal,
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -150,7 +151,7 @@ class SettingsView extends StatelessWidget {
                       size: 13,
                       color: _chevronColor,
                     ),
-                    onTap: (){},
+                    onTap: () => settingsCtrl.shareApp(),
                   ),
                 ],
               ),
@@ -163,8 +164,8 @@ class SettingsView extends StatelessWidget {
                   _buildSettingsTile(
                     icon: Icons.person_rounded,
                     iconBg: const Color(0xFF5856D6),
-                    title: "عن المطور",
-                    subtitle: '• تواصل مباشر',
+                    title: AppStrings.developerName,
+                    subtitle: '${AppStrings.developerRole} • تواصل مباشر',
                     trailingWidget: const Icon(
                       Icons.arrow_back_ios_new_rounded,
                       size: 13,
@@ -207,7 +208,7 @@ class SettingsView extends StatelessWidget {
                   _buildSettingsTile(
                     icon: Icons.verified_outlined,
                     iconBg: const Color(0xFF0D9488),
-                    title: 'التطبيق',
+                    title: 'صدقة جارية',
                     trailingWidget: const Text(
                       'مجاني وبدون إعلانات',
                       style: TextStyle(
@@ -343,12 +344,14 @@ class SettingsView extends StatelessWidget {
                 Expanded(
                   child: Obx(() {
                     final name = controller.userName.value.trim();
-                    final titleText = name.isNotEmpty
-                        ? 'مرحبًا بك يا $name '
-                        : AppStrings.userGreetingDefault;
-                    final subtitleText = name.isNotEmpty
-                        ? 'الملف الشخصي • اضغط للتعديل'
-                        : 'اضغط لتخصيص اسمك ورسائل التذكير';
+                    final titleText =
+                        name.isNotEmpty
+                            ? 'مرحبًا بك يا $name 🌸'
+                            : AppStrings.userGreetingDefault;
+                    final subtitleText =
+                        name.isNotEmpty
+                            ? 'الملف الشخصي • اضغط للتعديل'
+                            : 'اضغط لتخصيص اسمك ورسائل التذكير';
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -416,13 +419,7 @@ class SettingsView extends StatelessWidget {
                   color: iconBg,
                   borderRadius: BorderRadius.circular(7.5),
                 ),
-                child: Center(
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
+                child: Center(child: Icon(icon, color: Colors.white, size: 18)),
               ),
               const SizedBox(width: 13),
               // Title & Optional Subtitle

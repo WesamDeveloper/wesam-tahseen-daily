@@ -1,9 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_strings.dart';
 import '../controllers/surah_detail_controller.dart';
+import '../models/ayah_model.dart';
 import '../models/surah_model.dart';
 
 class _QuranThemeData {
@@ -451,6 +453,49 @@ class SurahView extends GetView<SurahDetailController> {
             ),
           ),
           actions: [
+            // Bookmark Action Button (الانتقال إلى الفاصل)
+            Obx(() {
+              final b = controller.bookmark.value;
+              final isInThisSurah =
+                  b != null && b.surahNumber == controller.surahNumber;
+              final hasAnyBookmark = b != null;
+
+              return IconButton(
+                tooltip: hasAnyBookmark
+                    ? "الانتقال إلى الفاصل (${b.surahName} - آية ${b.ayahNumber}) 🔖"
+                    : "الانتقال إلى الفاصل 🔖",
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      hasAnyBookmark
+                          ? Icons.bookmark_rounded
+                          : Icons.bookmark_border_rounded,
+                      size: 22,
+                      color: isInThisSurah
+                          ? const Color(0xFFD97706)
+                          : hasAnyBookmark
+                              ? theme.accentColor
+                              : theme.textColor.withValues(alpha: 0.75),
+                    ),
+                    if (isInThisSurah)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Container(
+                          width: 7,
+                          height: 7,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF59E0B),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                onPressed: () => controller.jumpToBookmark(context),
+              );
+            }),
             // Quick Font Size -
             IconButton(
               tooltip: "تصغير الخط",
@@ -537,6 +582,7 @@ class SurahView extends GetView<SurahDetailController> {
                   return Directionality(
                     textDirection: TextDirection.rtl,
                     child: ListView(
+                      controller: controller.scrollController,
                       physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 14,
@@ -547,6 +593,9 @@ class SurahView extends GetView<SurahDetailController> {
                         _buildSurahHeaderCard(theme),
 
                         const SizedBox(height: 14),
+
+                        // Bookmark Quick Jump Banner if set in this surah
+                        _buildCurrentSurahBookmarkBanner(theme),
 
                         // Basmala Banner (for all except At-Tawbah & Al-Fatihah)
                         if (controller.surahNumber != 9 &&
@@ -559,7 +608,7 @@ class SurahView extends GetView<SurahDetailController> {
 
                         // Quranic Verses Display (Mushaf Flow or Verse-by-Verse)
                         if (isMushaf)
-                          _buildMushafFlowView(theme, fontSize)
+                          _buildMushafFlowView(context, theme, fontSize)
                         else
                           _buildVerseByVerseView(context, theme, fontSize),
 
@@ -691,55 +740,267 @@ class SurahView extends GetView<SurahDetailController> {
   }
 
   // Continuous Mushaf Flow Mode (Classic Mushaf Page)
-  Widget _buildMushafFlowView(_QuranThemeData theme, double fontSize) {
-    final List<InlineSpan> spans = [];
+  Widget _buildMushafFlowView(
+    BuildContext context,
+    _QuranThemeData theme,
+    double fontSize,
+  ) {
+    return Obx(() {
+      final List<InlineSpan> spans = [];
+      final activeBookmark = controller.bookmark.value;
+      final highlighted = controller.highlightedAyah.value;
 
-    for (final a in controller.verses) {
-      spans.add(
-        TextSpan(
-          text: '${a.text.trim()} ',
-          style: TextStyle(
-            fontSize: fontSize,
-            fontFamily: AppStrings.fontAmiri,
-            height: 2.15,
-            color: theme.textColor,
-            letterSpacing: 0.2,
+      for (final a in controller.verses) {
+        final isBookmarked =
+            activeBookmark != null &&
+            activeBookmark.surahNumber == controller.surahNumber &&
+            activeBookmark.ayahNumber == a.ayah;
+        final isHighlighted = highlighted == a.ayah;
+
+        Color? bgHighlight;
+        if (isHighlighted) {
+          bgHighlight = const Color(0x66F59E0B);
+        } else if (isBookmarked) {
+          bgHighlight =
+              theme.isDark
+                  ? const Color(0x3DF59E0B)
+                  : const Color(0x28F59E0B);
+        }
+
+        // Invisible precise anchor at the start of the ayah for pixel-exact scrolling
+        spans.add(
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: SizedBox(
+              key: controller.getAyahKey(a.ayah),
+              width: 0.1,
+              height: 1.0,
+            ),
+          ),
+        );
+
+        spans.add(
+          TextSpan(
+            text: '${a.text.trim()} ',
+            style: TextStyle(
+              fontSize: fontSize,
+              fontFamily: AppStrings.fontAmiri,
+              height: 2.15,
+              color:
+                  isBookmarked
+                      ? (theme.isDark
+                          ? const Color(0xFFFDE68A)
+                          : const Color(0xFFB45309))
+                      : theme.textColor,
+              backgroundColor: bgHighlight,
+              fontWeight: isBookmarked ? FontWeight.w600 : FontWeight.normal,
+              letterSpacing: 0.2,
+            ),
+            recognizer:
+                TapGestureRecognizer()
+                  ..onTap = () => _showAyahOptionsSheet(context, a, theme),
+          ),
+        );
+
+        // Ornate Bookmark Indicator Pill in Mushaf flow!
+        if (isBookmarked) {
+          spans.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: GestureDetector(
+                onTap: () => _showAyahOptionsSheet(context, a, theme),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2.5,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFD97706), Color(0xFFB45309)],
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x33D97706),
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.bookmark_rounded,
+                        color: Colors.white,
+                        size: 12,
+                      ),
+                      SizedBox(width: 3),
+                      Text(
+                        "فاصل",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: AppStrings.fontCairo,
+                          height: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        spans.add(
+          TextSpan(
+            text: ' ﴿${a.ayah}﴾ ',
+            style: TextStyle(
+              fontSize: fontSize * 0.85,
+              fontFamily: AppStrings.fontAmiri,
+              color:
+                  isBookmarked
+                      ? const Color(0xFFD97706)
+                      : theme.ayahNumberColor,
+              fontWeight: FontWeight.bold,
+            ),
+            recognizer:
+                TapGestureRecognizer()
+                  ..onTap = () => _showAyahOptionsSheet(context, a, theme),
+          ),
+        );
+      }
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+        decoration: BoxDecoration(
+          color: theme.pageSurface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: theme.borderColor, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: theme.isDark ? 0.3 : 0.03),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: RichText(
+          text: TextSpan(children: spans),
+          textAlign: TextAlign.justify,
+        ),
+      );
+    });
+  }
+
+  // Current Surah Bookmark Quick Jump Banner
+  Widget _buildCurrentSurahBookmarkBanner(_QuranThemeData theme) {
+    return Obx(() {
+      final b = controller.bookmark.value;
+      if (b == null || b.surahNumber != controller.surahNumber) {
+        return const SizedBox.shrink();
+      }
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => controller.scrollToAyah(b.ayahNumber, highlight: true),
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD97706).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.bookmark_rounded,
+                      size: 18,
+                      color: Color(0xFFD97706),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "فاصل القراءة الحالي",
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF92400E),
+                            fontFamily: AppStrings.fontCairo,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          "وصلت عند الآية (${b.ayahNumber}) في سورة ${b.surahName}",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: AppStrings.fontCairo,
+                            color: theme.textColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD97706),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "انتقال للآية",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: AppStrings.fontCairo,
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_downward_rounded,
+                          size: 13,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       );
-      spans.add(
-        TextSpan(
-          text: ' ﴿${a.ayah}﴾ ',
-          style: TextStyle(
-            fontSize: fontSize * 0.85,
-            fontFamily: AppStrings.fontAmiri,
-            color: theme.ayahNumberColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-      decoration: BoxDecoration(
-        color: theme.pageSurface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.borderColor, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: theme.isDark ? 0.3 : 0.03),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: RichText(
-        text: TextSpan(children: spans),
-        textAlign: TextAlign.justify,
-      ),
-    );
+    });
   }
 
   // Verse-by-Verse Card Mode
@@ -748,78 +1009,406 @@ class SurahView extends GetView<SurahDetailController> {
     _QuranThemeData theme,
     double fontSize,
   ) {
-    return Column(
-      children: controller.verses.map((ayah) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.pageSurface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: theme.borderColor),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(
-                  alpha: theme.isDark ? 0.2 : 0.02,
+    return Obx(() {
+      final activeBookmark = controller.bookmark.value;
+      final highlighted = controller.highlightedAyah.value;
+
+      return Column(
+        children:
+            controller.verses.map((ayah) {
+              final isBookmarked =
+                  activeBookmark != null &&
+                  activeBookmark.surahNumber == controller.surahNumber &&
+                  activeBookmark.ayahNumber == ayah.ayah;
+              final isHighlighted = highlighted == ayah.ayah;
+
+              return Container(
+                key: controller.getAyahKey(ayah.ayah),
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color:
+                      isHighlighted
+                          ? const Color(0xFFF59E0B).withValues(alpha: 0.18)
+                          : (isBookmarked
+                              ? const Color(0xFFF59E0B).withValues(alpha: 0.08)
+                              : theme.pageSurface),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color:
+                        isBookmarked
+                            ? const Color(0xFFF59E0B)
+                            : (isHighlighted
+                                ? const Color(0xFFF59E0B)
+                                : theme.borderColor),
+                    width: isBookmarked || isHighlighted ? 1.8 : 1.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                          isBookmarked
+                              ? const Color(0xFFF59E0B).withValues(alpha: 0.12)
+                              : Colors.black.withValues(
+                                alpha: theme.isDark ? 0.2 : 0.02,
+                              ),
+                      blurRadius: isBookmarked ? 10 : 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Card Top: Ayah Number & Quick Copy Action
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Top Bookmark Badge inside card if set
+                    if (isBookmarked)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: const Color(
+                              0xFFF59E0B,
+                            ).withValues(alpha: 0.35),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.bookmark_rounded,
+                              size: 15,
+                              color: Color(0xFFD97706),
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              "فاصل القراءة الحالي 🔖",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: AppStrings.fontCairo,
+                                color: Color(0xFFB45309),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // Card Top: Ayah Number & Actions
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                isBookmarked
+                                    ? const Color(
+                                      0xFFF59E0B,
+                                    ).withValues(alpha: 0.2)
+                                    : theme.ayahNumberColor.withValues(
+                                      alpha: 0.1,
+                                    ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            "الآية ${ayah.ayah}",
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: AppStrings.fontCairo,
+                              color:
+                                  isBookmarked
+                                      ? const Color(0xFFD97706)
+                                      : theme.ayahNumberColor,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Bookmark Toggle Button
+                            IconButton(
+                              tooltip:
+                                  isBookmarked
+                                      ? "الفاصل محفوظ هنا (اضغط للإزالة)"
+                                      : "وضع فاصل القراءة هنا",
+                              icon: Icon(
+                                isBookmarked
+                                    ? Icons.bookmark_rounded
+                                    : Icons.bookmark_outline_rounded,
+                                size: 20,
+                                color:
+                                    isBookmarked
+                                        ? const Color(0xFFD97706)
+                                        : theme.textColor.withValues(
+                                          alpha: 0.45,
+                                        ),
+                              ),
+                              onPressed: () => controller.toggleBookmark(ayah),
+                            ),
+                            // Share Ayah Button
+                            IconButton(
+                              tooltip: "مشاركة الآية",
+                              icon: Icon(
+                                Icons.share_rounded,
+                                size: 18,
+                                color: theme.textColor.withValues(alpha: 0.45),
+                              ),
+                              onPressed: () => controller.shareAyah(ayah),
+                            ),
+                            // Copy Ayah Button
+                            IconButton(
+                              tooltip: "نسخ الآية",
+                              icon: Icon(
+                                Iconsax.copy,
+                                size: 18,
+                                color: theme.textColor.withValues(alpha: 0.45),
+                              ),
+                              onPressed:
+                                  () => _copyAyah(
+                                    context,
+                                    ayah.text,
+                                    ayah.ayah,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    decoration: BoxDecoration(
-                      color: theme.ayahNumberColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      "الآية ${ayah.ayah}",
+                    const SizedBox(height: 10),
+                    // Ayah Text
+                    SelectableText(
+                      ayah.text.trim(),
                       style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: AppStrings.fontCairo,
-                        color: theme.ayahNumberColor,
+                        fontSize: fontSize,
+                        fontFamily: AppStrings.fontAmiri,
+                        height: 2.1,
+                        color:
+                            isBookmarked
+                                ? (theme.isDark
+                                    ? const Color(0xFFFDE68A)
+                                    : const Color(0xFFB45309))
+                                : theme.textColor,
+                        fontWeight:
+                            isBookmarked ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+      );
+    });
+  }
+
+  // Bottom Sheet for Ayah interaction in Mushaf mode
+  void _showAyahOptionsSheet(
+    BuildContext context,
+    AyahModel ayah,
+    _QuranThemeData theme,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.pageSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      builder: (ctx) {
+        return Obx(() {
+          final isBookmarked = controller.isAyahBookmarked(ayah.ayah);
+
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 14, 18, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  IconButton(
-                    tooltip: "نسخ الآية",
-                    icon: Icon(
-                      Iconsax.copy,
-                      size: 18,
-                      color: theme.textColor.withValues(alpha: 0.5),
+                  const SizedBox(height: 12),
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "سورة ${controller.surahTitle} • الآية (${ayah.ayah})",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: AppStrings.fontCairo,
+                          color: theme.textColor,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 20),
+                        color: theme.textColor.withValues(alpha: 0.6),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Ayah Preview Quote
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.accentColor.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.accentColor.withValues(alpha: 0.15),
+                      ),
                     ),
-                    onPressed: () => _copyAyah(context, ayah.text, ayah.ayah),
+                    child: Text(
+                      "﴿ ${ayah.text.trim()} ﴾",
+                      style: TextStyle(
+                        fontFamily: AppStrings.fontAmiri,
+                        fontSize: 16.5,
+                        height: 1.8,
+                        color: theme.textColor,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Option 1: Bookmark
+                  ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        isBookmarked
+                            ? Icons.bookmark_remove_rounded
+                            : Icons.bookmark_add_rounded,
+                        color: const Color(0xFFD97706),
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      isBookmarked
+                          ? "إزالة فاصل القراءة عن هذه الآية"
+                          : "وضع فاصل القراءة عند هذه الآية 🔖",
+                      style: TextStyle(
+                        fontFamily: AppStrings.fontCairo,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13.5,
+                        color:
+                            isBookmarked
+                                ? Colors.red.shade700
+                                : theme.textColor,
+                      ),
+                    ),
+                    subtitle: Text(
+                      isBookmarked
+                          ? "اضغط لإزالة الفاصل من هذا الموضع"
+                          : "لحفظ مكان توقفك والرجوع إليه لاحقًا بزر واحد",
+                      style: TextStyle(
+                        fontFamily: AppStrings.fontCairo,
+                        fontSize: 11.5,
+                        color: theme.textColor.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      controller.toggleBookmark(ayah);
+                    },
+                  ),
+
+                  // Option 2: Copy
+                  ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.accentColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Iconsax.copy,
+                        color: theme.accentColor,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      "نسخ الآية الكريمة",
+                      style: TextStyle(
+                        fontFamily: AppStrings.fontCairo,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13.5,
+                        color: theme.textColor,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _copyAyah(context, ayah.text, ayah.ayah);
+                    },
+                  ),
+
+                  // Option 3: Share
+                  ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF34C759).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.share_rounded,
+                        color: Color(0xFF34C759),
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      "مشاركة الآية",
+                      style: TextStyle(
+                        fontFamily: AppStrings.fontCairo,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13.5,
+                        color: theme.textColor,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      controller.shareAyah(ayah);
+                    },
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              // Ayah Text
-              SelectableText(
-                ayah.text.trim(),
-                style: TextStyle(
-                  fontSize: fontSize,
-                  fontFamily: AppStrings.fontAmiri,
-                  height: 2.1,
-                  color: theme.textColor,
-                ),
-                textAlign: TextAlign.justify,
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+            ),
+          );
+        });
+      },
     );
   }
 

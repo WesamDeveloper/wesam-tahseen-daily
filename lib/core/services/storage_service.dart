@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/quran/models/quran_bookmark.dart';
 import '../constants/storage_keys.dart';
 
 class StorageService extends GetxService {
@@ -99,6 +100,65 @@ class StorageService extends GetxService {
       StorageKeys.nextScheduledNotificationTimestamp,
       timestamp,
     );
+  }
+
+  // --- Quran Reading Bookmark ---
+  QuranBookmark? getQuranBookmark() {
+    final surah = _prefs.getInt(StorageKeys.quranBookmarkSurah);
+    final surahName = _prefs.getString(StorageKeys.quranBookmarkSurahName);
+    final ayah = _prefs.getInt(StorageKeys.quranBookmarkAyah);
+    final ayahText = _prefs.getString(StorageKeys.quranBookmarkAyahText);
+    final timeStr = _prefs.getString(StorageKeys.quranBookmarkTimestamp);
+
+    if (surah == null || surahName == null || ayah == null) {
+      return null;
+    }
+
+    return QuranBookmark(
+      surahNumber: surah,
+      surahName: surahName,
+      ayahNumber: ayah,
+      ayahText: ayahText,
+      timestamp: timeStr != null
+          ? (DateTime.tryParse(timeStr) ?? DateTime.now())
+          : DateTime.now(),
+    );
+  }
+
+  Future<bool> saveQuranBookmark(QuranBookmark bookmark) async {
+    await _prefs.setInt(StorageKeys.quranBookmarkSurah, bookmark.surahNumber);
+    await _prefs.setString(
+      StorageKeys.quranBookmarkSurahName,
+      bookmark.surahName,
+    );
+    await _prefs.setInt(StorageKeys.quranBookmarkAyah, bookmark.ayahNumber);
+    if (bookmark.ayahText != null) {
+      await _prefs.setString(
+        StorageKeys.quranBookmarkAyahText,
+        bookmark.ayahText!,
+      );
+    } else {
+      await _prefs.remove(StorageKeys.quranBookmarkAyahText);
+    }
+    await _prefs.setString(
+      StorageKeys.quranBookmarkTimestamp,
+      bookmark.timestamp.toIso8601String(),
+    );
+    return true;
+  }
+
+  Future<bool> removeQuranBookmark() async {
+    await _prefs.remove(StorageKeys.quranBookmarkSurah);
+    await _prefs.remove(StorageKeys.quranBookmarkSurahName);
+    await _prefs.remove(StorageKeys.quranBookmarkAyah);
+    await _prefs.remove(StorageKeys.quranBookmarkAyahText);
+    await _prefs.remove(StorageKeys.quranBookmarkTimestamp);
+    return true;
+  }
+
+  bool hasQuranBookmark() {
+    return _prefs.getInt(StorageKeys.quranBookmarkSurah) != null &&
+        _prefs.getInt(StorageKeys.quranBookmarkAyah) != null;
   }
 
   SharedPreferences get rawPrefs => _prefs;

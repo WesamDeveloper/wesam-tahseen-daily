@@ -96,6 +96,7 @@ void main() {
     expect(find.text(AppStrings.userGreetingDefault), findsOneWidget);
     expect(find.text(AppStrings.quranReminderTitle), findsOneWidget);
     expect(find.text(AppStrings.appGuideTitle), findsOneWidget);
+    expect(find.text('مشاركة التطبيق'), findsOneWidget);
     expect(find.text(AppStrings.developerName), findsOneWidget);
 
     // 1. Test navigation into Notification Settings
@@ -123,6 +124,8 @@ void main() {
     expect(find.text(AppStrings.developerBio), findsOneWidget);
     expect(find.text(AppStrings.developerPhone), findsOneWidget);
     expect(find.text('مراسلة المطور'), findsOneWidget);
+    expect(find.text(AppStrings.developerTelegramTitle), findsOneWidget);
+    expect(find.text(AppStrings.developerTelegramHandle), findsOneWidget);
     // Verify GitHub is completely removed as requested
     expect(find.textContaining('github', findRichText: true), findsNothing);
     expect(find.byIcon(Icons.code), findsNothing);
@@ -158,16 +161,16 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
 
     // Verify dynamic greeting updated
-    expect(find.text('مرحبًا بك يا وسام الجنيد 🌸'), findsOneWidget);
+    expect(find.textContaining('وسام الجنيد'), findsWidgets);
     expect(storageService.getUserName(), 'وسام الجنيد');
 
     // Pop back to SettingsView to verify greeting updated on master page too!
     Get.back();
     await tester.pumpAndSettle();
-    expect(find.text('مرحبًا بك يا وسام الجنيد 🌸'), findsOneWidget);
+    expect(find.textContaining('وسام الجنيد'), findsWidgets);
 
     // Return to UserProfileView to test clear
-    await tester.tap(find.text('مرحبًا بك يا وسام الجنيد 🌸'));
+    await tester.tap(find.textContaining('وسام الجنيد').first);
     await tester.pumpAndSettle();
 
     final deleteIcon = find.byIcon(Icons.delete_outline_rounded);

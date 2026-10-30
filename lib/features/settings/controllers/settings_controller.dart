@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/services/storage_service.dart';
@@ -55,16 +56,33 @@ class SettingsController extends GetxController {
     }
   }
 
-  void copyToClipboard(String text, String label) {
-    Clipboard.setData(ClipboardData(text: text));
-    _showSnackbar('تم النسخ', 'تم نسخ $label إلى الحافظة');
+  Future<void> launchTelegram() async {
+    final uri = Uri.parse(AppStrings.developerTelegramUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      copyToClipboard(AppStrings.developerTelegramUrl, 'رابط قناة التلجرام');
+    }
   }
 
-  void shareApp() {
-    const shareText =
-        'تطبيق وسام للتحصين اليومي 🌿\nتطبيق إسلامي شامل للأذكار، المصحف الشريف، والتلاوات الصوتية، مجاني وبدون إعلانات.\nنسأل الله أن ينفع به الجميع.';
-    Clipboard.setData(const ClipboardData(text: shareText));
-    _showSnackbar('تم نسخ رابط التطبيق', 'تم نسخ رسالة مشاركة التطبيق إلى الحافظة بنجاح 🌿');
+  void copyToClipboard(String text, String label) {
+    Clipboard.setData(ClipboardData(text: text));
+    _showSnackbar('تم النسخ', 'تم نسخ $label إلى الحافظة بنجاح 🌿');
+  }
+
+  Future<void> shareApp() async {
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          text: AppStrings.appShareMessage,
+          subject: 'تطبيق ${AppStrings.appName}',
+        ),
+      );
+    } catch (_) {
+      // Fallback to clipboard if native share fails
+      Clipboard.setData(const ClipboardData(text: AppStrings.appShareMessage));
+      _showSnackbar('تم نسخ رابط التطبيق', 'تم نسخ رسالة ورابط مشاركة التطبيق إلى الحافظة بنجاح 🌿');
+    }
   }
 
   void _showSnackbar(String title, String message) {
