@@ -4,6 +4,8 @@ import '../../quran/controllers/quran_controller.dart';
 import '../../quran/repositories/quran_repository.dart';
 import '../../quran_audio/controllers/quran_audio_controller.dart';
 import '../../quran_audio/services/quran_audio_service.dart';
+import '../../settings/controllers/notification_controller.dart';
+import '../../settings/controllers/settings_controller.dart';
 import '../controllers/home_controller.dart';
 
 class HomeBinding extends Bindings {
@@ -18,6 +20,8 @@ class HomeBinding extends Bindings {
     Get.lazyPut<QuranAudioController>(
       () => QuranAudioController(audioService: Get.find<QuranAudioService>()),
     );
+    Get.lazyPut<SettingsController>(() => SettingsController());
+    Get.lazyPut<NotificationController>(() => NotificationController());
     Get.lazyPut<AboutController>(() => AboutController());
   }
 }

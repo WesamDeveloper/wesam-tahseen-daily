@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
-import '../../about/views/about_view.dart';
 import '../../adhkar/views/prayers_view.dart';
 import '../../quran/views/quran_view.dart';
 import '../../quran_audio/views/quran_audio_view.dart';
+import '../../settings/views/settings_view.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/custom_motion_tab_bar.dart';
 
@@ -26,7 +26,7 @@ class HomeView extends GetView<HomeController> {
             AppStrings.tabPrayers,
             AppStrings.tabQuran,
             AppStrings.tabQuranAudio,
-            AppStrings.tabAbout,
+            AppStrings.tabSettings,
           ],
           tabItemBuilders: [
             (color, size) => Icon(Icons.mosque, color: color, size: size),
@@ -38,7 +38,8 @@ class HomeView extends GetView<HomeController> {
               height: size,
               colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
             ),
-            (color, size) => Icon(Icons.person, color: color, size: size),
+            (color, size) =>
+                Icon(Icons.settings_rounded, color: color, size: size),
           ],
           tabSize: 50,
           tabBarHeight: 55,
@@ -65,7 +66,7 @@ class HomeView extends GetView<HomeController> {
           Center(child: PrayersView()),
           Center(child: QuranView()),
           Center(child: QuranAudioView()),
-          Center(child: AboutView()),
+          Center(child: SettingsView()),
         ],
       ),
     );

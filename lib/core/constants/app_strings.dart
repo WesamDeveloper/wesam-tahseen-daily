@@ -14,6 +14,7 @@ class AppStrings {
   static const String tabQuran = 'Quran';
   static const String tabQuranAudio = 'Audio';
   static const String tabAbout = 'About Me';
+  static const String tabSettings = 'Settings';
 
   // Titles
   static const String prayersTitle = 'الاذكار';
@@ -25,8 +26,49 @@ class AppStrings {
   static const String reciterTitle = 'الشيخ مشاري بن راشد العفاسي';
   static const String aboutTitle = 'من أنا';
   static const String tasbeehTitle = 'المسبحة';
-  static const String settingsTitle = 'الضبط';
+  static const String settingsTitle = 'الإعدادات';
+  static const String profileTitle = 'الملف الشخصي';
+  static const String notificationSettingsTitle = 'إعدادات التذكير';
+  static const String aboutDeveloperTitle = 'عن المطور';
   static const String studyTitle = 'الدروس';
+  static const String appGuideTitle = 'إرشادات الاستخدام';
+
+  // Developer Profile
+  static const String developerName = 'وسام الجنيد';
+  static const String developerRole = 'مطور تطبيقات Flutter';
+  static const String developerBio =
+      'وسام الجنيد، مطور تطبيقات Flutter، مهتم بتطوير التطبيقات وتقديم تجارب رقمية بسيطة ومفيدة.';
+  static const String developerPhone = '+967775904988';
+  static const String developerEmail = 'wesam.developer@gmail.com';
+
+  // Settings & Notifications
+  static const String quranReminderTitle = 'التذكير بالقرآن الكريم';
+  static const String quranReminderSubtitle =
+      'يذكّرك التطبيق بلطف بتلاوة القرآن الكريم وتدبر آياته عند الانقطاع عنه.';
+  static const String userGreetingDefault = 'أهلاً بك';
+  static const String userGreetingSubtitle = 'طاب يومك بذكر الله وتلاوة آياته';
+  static const String userNameHint = 'أدخل اسمك (اختياري)...';
+  static const String userNameHelper =
+      'يُستخدم اسمك لتخصيص رسائل التذكير بصورة ودية ومحفزة.';
+  static const String saveName = 'حفظ';
+  static const String clearName = 'مسح';
+  static const String nameSavedSuccess = 'تم حفظ الاسم بنجاح';
+  static const String nameClearedSuccess = 'تم مسح الاسم بنجاح';
+
+  static const String reminderStatusActive = 'مفعل';
+  static const String reminderStatusInactive = 'متوقف';
+  static const String intervalDaily = 'كل يوم';
+  static const String intervalThreeDays = 'كل 3 أيام';
+  static const String intervalWeekly = 'كل أسبوع';
+  static const String intervalMonthly = 'كل شهر';
+  static const String intervalOff = 'إيقاف التذكير نهائيًا';
+
+  static const String testNotificationTitle = 'اختبار التذكير الآن';
+  static const String testNotificationSent = 'تم إرسال إشعار تجريبي بنجاح';
+  static const String permissionDeniedTitle = 'تنبيه الصلاحيات';
+  static const String permissionDeniedMessage =
+      'صلاحية الإشعارات غير مفعلة. يرجى السماح بالإشعارات من إعدادات جهازك لتتمكن من استلام تذكيرات القرآن الكريم.';
+  static const String grantPermissionButton = 'منح الصلاحية';
 
   // Audio Player Strings
   static const String searchSurahHint =

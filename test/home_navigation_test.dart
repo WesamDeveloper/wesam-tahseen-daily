@@ -85,7 +85,7 @@ void main() {
                   AppStrings.tabPrayers,
                   AppStrings.tabQuran,
                   AppStrings.tabQuranAudio,
-                  AppStrings.tabAbout,
+                  AppStrings.tabSettings,
                 ],
                 tabItemBuilders: [
                   (color, size) =>
@@ -99,7 +99,7 @@ void main() {
                     colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
                   ),
                   (color, size) =>
-                      Icon(Icons.person, color: color, size: size),
+                      Icon(Icons.settings_rounded, color: color, size: size),
                 ],
                 tabSize: 50,
                 tabBarHeight: 55,
@@ -132,7 +132,7 @@ void main() {
         AppStrings.tabPrayers,
         AppStrings.tabQuran,
         AppStrings.tabQuranAudio,
-        AppStrings.tabAbout,
+        AppStrings.tabSettings,
       ]);
 
       // Verify SVG is rendered for Quran Audio tab
@@ -141,7 +141,7 @@ void main() {
       // Verify other tab icons
       expect(find.byIcon(Icons.mosque), findsWidgets);
       expect(find.byIcon(Icons.menu_book_rounded), findsWidgets);
-      expect(find.byIcon(Icons.person), findsWidgets);
+      expect(find.byIcon(Icons.settings_rounded), findsWidgets);
 
       // Test tab selection to tab 2 (Quran Audio)
       homeController.changeTab(2);
