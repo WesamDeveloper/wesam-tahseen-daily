@@ -27,8 +27,8 @@ class MyApp extends StatelessWidget {
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
       initialBinding: InitialBinding(),
-      locale: const Locale('en'),
-      fallbackLocale: const Locale('en'),
+      locale: const Locale('ar'),
+      fallbackLocale: const Locale('ar'),
     );
   }
 }

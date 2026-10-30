@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../../../core/constants/app_strings.dart';
 import '../models/zikr_category.dart';
 import '../models/zikr_item.dart';
 import '../repositories/adhkar_repository.dart';
@@ -14,8 +15,21 @@ class AdhkarController extends GetxController {
   final RxInt currentReadCount = 0.obs;
   final RxInt totalReadCount = 0.obs;
   final RxInt textFont = 20.obs;
+  final RxInt initialCategoryCount = 0.obs;
+  final RxString selectedFontFamily = AppStrings.fontAmiri.obs;
 
   bool get isFinished => azkarList.isEmpty;
+
+  int get completedCount =>
+      (initialCategoryCount.value - azkarList.length).clamp(
+        0,
+        initialCategoryCount.value,
+      );
+
+  double get progress =>
+      initialCategoryCount.value > 0
+          ? completedCount / initialCategoryCount.value
+          : 0.0;
 
   @override
   void onInit() {
@@ -34,7 +48,9 @@ class AdhkarController extends GetxController {
   void setCategory(ZikrCategoryType type) {
     currentCategoryType.value = type;
     currentReadCount.value = 0;
-    azkarList.assignAll(_repository.getAzkar(type));
+    final items = _repository.getAzkar(type);
+    azkarList.assignAll(items);
+    initialCategoryCount.value = items.length;
   }
 
   void loadTotalReadCount() {
@@ -59,6 +75,16 @@ class AdhkarController extends GetxController {
     }
   }
 
+  void resetItem(int index) {
+    if (index < 0 || index >= azkarList.length) return;
+    azkarList[index].count = azkarList[index].initialCount;
+    azkarList.refresh();
+  }
+
+  void restartCategory() {
+    setCategory(currentCategoryType.value);
+  }
+
   Future<void> _onFinish() async {
     final updated = await _repository.addReadCount(currentReadCount.value);
     totalReadCount.value = updated;
@@ -75,4 +101,14 @@ class AdhkarController extends GetxController {
       textFont.value -= 2;
     }
   }
+
+  void setFontSize(double size) {
+    final rounded = size.round().clamp(18, 40);
+    textFont.value = rounded;
+  }
+
+  void setFontFamily(String family) {
+    selectedFontFamily.value = family;
+  }
 }
+

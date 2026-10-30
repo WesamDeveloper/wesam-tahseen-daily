@@ -99,6 +99,31 @@ void main() {
       adhkarController.increaseFontSize();
       expect(adhkarController.textFont.value, 40);
     });
+
+    test('Progress tracking and reset capabilities work correctly', () async {
+      adhkarController.setCategory(ZikrCategoryType.safer);
+      expect(adhkarController.initialCategoryCount.value, 5);
+      expect(adhkarController.completedCount, 0);
+      expect(adhkarController.progress, 0.0);
+
+      // Tap first item
+      await adhkarController.onTapItem(0);
+      expect(adhkarController.completedCount, 1);
+      expect(adhkarController.progress, 0.2);
+
+      // Reset single item if tapped accidentally
+      adhkarController.azkarList[0].count = 2;
+      adhkarController.resetItem(0);
+      expect(
+        adhkarController.azkarList[0].count,
+        adhkarController.azkarList[0].initialCount,
+      );
+
+      // Restart category
+      adhkarController.restartCategory();
+      expect(adhkarController.azkarList.length, 5);
+      expect(adhkarController.currentReadCount.value, 0);
+    });
   });
 
   group('Tasbeeh Controller Tests', () {
