@@ -11,7 +11,7 @@ class HomeController extends GetxController
     super.onInit();
     motionTabBarController = MotionTabBarController(
       initialIndex: 0,
-      length: 3,
+      length: 4,
       vsync: this,
     );
   }

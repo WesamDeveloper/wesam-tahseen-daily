@@ -17,6 +17,9 @@ dependencies:
   iconsax: ^0.0.8
   url_launcher: ^6.3.2
   get: ^4.7.3
+  just_audio: ^0.10.6
+  audio_session: ^0.2.4
+  flutter_svg: ^2.3.2
 
 dev_dependencies:
   flutter_test:
@@ -36,6 +39,8 @@ flutter:
   assets:
     - assets/quran/quran_full.json
     - images/
+    - assets/images/
+    - assets/audio/
 
   fonts:
     - family: Cairo

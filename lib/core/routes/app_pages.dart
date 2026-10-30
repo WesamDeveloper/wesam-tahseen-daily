@@ -12,6 +12,8 @@ import '../../features/quran/bindings/quran_binding.dart';
 import '../../features/quran/bindings/surah_detail_binding.dart';
 import '../../features/quran/views/quran_view.dart';
 import '../../features/quran/views/surah_view.dart';
+import '../../features/quran_audio/bindings/quran_audio_binding.dart';
+import '../../features/quran_audio/views/quran_audio_view.dart';
 import '../../features/settings/views/settings_view.dart';
 import '../../features/splash/bindings/splash_binding.dart';
 import '../../features/splash/views/splash_view.dart';
@@ -56,6 +58,12 @@ class AppPages {
       name: AppRoutes.quran,
       page: () => const QuranView(),
       binding: QuranBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.quranAudio,
+      page: () => const QuranAudioView(),
+      binding: QuranAudioBinding(),
       transition: Transition.rightToLeft,
     ),
     GetPage(

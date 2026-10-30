@@ -12,15 +12,34 @@ class AppStrings {
   // Navigation labels
   static const String tabPrayers = 'Prayers';
   static const String tabQuran = 'Quran';
+  static const String tabQuranAudio = 'Audio';
   static const String tabAbout = 'About Me';
 
   // Titles
   static const String prayersTitle = 'الاذكار';
   static const String quranTitle = 'القرآن الكريم';
+  static const String quranAudioTitle = 'القرآن الصوتي';
+  static const String quranAudioSubtitle =
+      'استمع إلى تلاوات عطرة بصوت الشيخ مشاري العفاسي';
+  static const String reciterName = 'مشاري العفاسي';
+  static const String reciterTitle = 'الشيخ مشاري بن راشد العفاسي';
   static const String aboutTitle = 'من أنا';
   static const String tasbeehTitle = 'المسبحة';
   static const String settingsTitle = 'الضبط';
   static const String studyTitle = 'الدروس';
+
+  // Audio Player Strings
+  static const String searchSurahHint =
+      'ابحث عن سورة (مثال: الفاتحة، الكهف)...';
+  static const String nowPlaying = 'جاري التلاوة';
+  static const String paused = 'متوقف مؤقتًا';
+  static const String buffering = 'جاري التحميل...';
+  static const String readyToPlay = 'جاهز للاستماع';
+  static const String completed = 'اكتملت التلاوة';
+  static const String audioError = 'تعذر تشغيل الملف الصوتي';
+  static const String noSurahsFound = 'لا توجد سور مطابقة لبحثك';
+  static const String surahNumber = 'رقم السورة';
+  static const String retry = 'إعادة المحاولة';
 
   // Categories
   static const String masiTitle = 'أذكار المساء';

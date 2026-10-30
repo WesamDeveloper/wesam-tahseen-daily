@@ -4,5 +4,7 @@ class AppAssets {
   static const String logo = 'images/dene.png';
   static const String islamicPattern = 'images/5.png';
   static const String profile = 'images/me.png';
+  static const String reciterImage = 'assets/images/Mishary_Alafasy.jpg';
+  static const String quranAudioSvg = 'assets/images/quran_audio.svg';
   static const String quranFullJson = 'assets/quran/quran_full.json';
 }
