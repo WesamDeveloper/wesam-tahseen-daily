@@ -208,7 +208,7 @@ class SettingsView extends StatelessWidget {
                   _buildSettingsTile(
                     icon: Icons.verified_outlined,
                     iconBg: const Color(0xFF0D9488),
-                    title: 'صدقة جارية',
+                    title: 'التطبيق',
                     trailingWidget: const Text(
                       'مجاني وبدون إعلانات',
                       style: TextStyle(
@@ -346,7 +346,7 @@ class SettingsView extends StatelessWidget {
                     final name = controller.userName.value.trim();
                     final titleText =
                         name.isNotEmpty
-                            ? 'مرحبًا بك يا $name 🌸'
+                            ? 'مرحبًا بك يا $name '
                             : AppStrings.userGreetingDefault;
                     final subtitleText =
                         name.isNotEmpty
